@@ -105,7 +105,7 @@ group($config->withSubject("Validating all mocker methods"), function (TestCase 
             ->called(0);
     });
 
-    $case->expect(function(Expect $inst) use($mail) {
+    $case->check(function(Expect $inst) use($mail) {
         $inst->expect(fn() => $mail->addFromEmail("john.doe@gmail.com", "John Doe"))->isThrowable(InvalidArgumentException::class);
     });
 

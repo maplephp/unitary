@@ -25,6 +25,7 @@ class Expect extends ValidationChain
     protected Throwable|false|null $except = null;
     private ?TestCase $testCase = null;
     private ?array $trace = null;
+	private bool $valueHasBeenSet = false;
 
     /**
      * Static init validation chain
@@ -37,10 +38,49 @@ class Expect extends ValidationChain
         return new self($value);
     }
 
+	/**
+	 * Set a value
+	 *
+	 * @deprecated Use against() instead
+	 * @param mixed $value
+	 * @return self
+	 */
+	public function setValue(mixed $value): self
+	{
+		$this->valueHasBeenSet = true;
+		return parent::setValue($value);
+	}
 
+	/**
+	 * Set the value to be validated
+	 *
+	 * @param mixed $value
+	 * @return self
+	 */
+	public function against(mixed $value): self
+	{
+		$this->valueHasBeenSet = true;
+		return parent::setValue($value);
+	}
+
+	/**
+	 * Check if a value has been set
+	 *
+	 * @return bool
+	 */
+	public function hasValueBeenSet(): bool
+	{
+		return $this->valueHasBeenSet;
+	}
+
+	/**
+	 * @deprecated Use against() instead
+	 * @param mixed $value
+	 * @return self
+	 */
     public function expect(mixed $value): self
     {
-        return $this->setValue($value);
+        return $this->against($value);
     }
 
     /**
@@ -136,7 +176,7 @@ class Expect extends ValidationChain
     public function isThrowable(string|object|callable $compare): self
     {
         if ($except = $this->getException()) {
-            $this->setValue($except);
+            $this->against($except);
         }
         /** @psalm-suppress PossiblyInvalidCast */
         $this->validateExcept(__METHOD__, $compare, fn() => $this->isClass((string)$compare));
@@ -153,7 +193,7 @@ class Expect extends ValidationChain
     public function hasThrowableMessage(string|callable $compare): self
     {
         if ($except = $this->getException()) {
-            $this->setValue($except->getMessage());
+            $this->against($except->getMessage());
         }
         /** @psalm-suppress PossiblyInvalidCast */
         $this->validateExcept(__METHOD__, $compare, fn() => $this->isEqualTo($compare));
@@ -170,7 +210,7 @@ class Expect extends ValidationChain
     public function hasThrowableCode(int|callable $compare): self
     {
         if ($except = $this->getException()) {
-            $this->setValue($except->getCode());
+            $this->against($except->getCode());
         }
         /** @psalm-suppress PossiblyInvalidCast */
         $this->validateExcept(__METHOD__, $compare, fn() => $this->isEqualTo($compare));
@@ -188,7 +228,7 @@ class Expect extends ValidationChain
     {
         if ($except = $this->getException()) {
             $value = method_exists($except, 'getSeverity') ? $except->getSeverity() : 0;
-            $this->setValue($value);
+            $this->against($value);
         }
         /** @psalm-suppress PossiblyInvalidCast */
         $this->validateExcept(__METHOD__, $compare, fn() => $this->isEqualTo($compare));
@@ -205,7 +245,7 @@ class Expect extends ValidationChain
     public function hasThrowableFile(string|callable $compare): self
     {
         if ($except = $this->getException()) {
-            $this->setValue($except->getFile());
+            $this->against($except->getFile());
         }
         /** @psalm-suppress PossiblyInvalidCast */
         $this->validateExcept(__METHOD__, $compare, fn() => $this->isEqualTo($compare));
@@ -222,7 +262,7 @@ class Expect extends ValidationChain
     public function hasThrowableLine(int|callable $compare): self
     {
         if ($except = $this->getException()) {
-            $this->setValue($except->getLine());
+            $this->against($except->getLine());
         }
         /** @psalm-suppress PossiblyInvalidCast */
         $this->validateExcept(__METHOD__, $compare, fn() => $this->isEqualTo($compare));
@@ -253,7 +293,7 @@ class Expect extends ValidationChain
         }
 
         if ($this->except === false) {
-            $this->setValue(null);
+            $this->against(null);
         }
         return $this;
     }
