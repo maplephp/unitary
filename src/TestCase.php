@@ -358,7 +358,7 @@ final class TestCase
 	 * @return void
 	 * @throws ErrorException
 	 */
-	public function check(Closure $validation, ?string $describe = null): void
+	public function check(Closure $validation, ?string $describe = null): TestUnit
 	{
 
 		$expectInst = null;
@@ -379,6 +379,7 @@ final class TestCase
 			$this->testUnit->setThrowable(new ExceptionItem($blunderSoftException));
 		}
 		$this->testUnit->setTestValue($this->expect->getValue());
+		return $this->testUnit;
 	}
 
 
