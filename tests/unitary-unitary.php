@@ -1,6 +1,7 @@
 <?php
 
 use MaplePHP\Unitary\{Config\TestConfig, Expect, TestCase};
+use MaplePHP\Blunder\Exceptions\BlunderSoftException;
 
 $config = TestConfig::make()->withName("unitary");
 
@@ -11,22 +12,6 @@ group($config->withSubject("Assert validations"), function (TestCase $case) {
         assert($inst->isEqualTo("HelloWorld")->isValid(), "Assert has failed");
     });
     assert(1 === 1, "Assert has failed");
-
-});
-
-group("Example API Response", function(TestCase $case) {
-
-    $case->validate('{"response":{"status":200,"message":"ok"}}', function(Expect $expect) {
-        $expect->isJson()
-               ->hasJsonValueAt("response.status", 200)
-               ->assert("Json status response is invalid");;
-    })->describe("Checking PSR Response");
-
-    $case->validate('{"response":{"status":200,"message":"ok"}}', function(Expect $expect) {
-        $expect->isJson()
-            ->hasJsonValueAt("response.status", 200)
-            ->validate("Json status response is invalid");;
-    })->describe("Checking PSR Response");
 
 });
 
@@ -45,11 +30,12 @@ group($config->withSubject("Tets old validation syntax"), function ($case) {
 
 group($config->withSubject("Test json validation"), function(TestCase $case) {
 
-    $case->validate('{"response":{"status":200,"message":"ok"}}', function(Expect $expect) {
+    $case->check(function(Expect $expect) {
+        $expect->against('{"response":{"status":200,"message":"ok"}}')
+	        ->isJson()
+	        ->hasJsonValueAt("response.status", 200)
+            ->assert();
 
-        $expect->isJson()->hasJsonValueAt("response.status", 200);
-        assert($expect->isValid(), "Expected JSON structure did not match.");
-
-    })->describe("Test json validation");
+    }, "Test json validation");
 
 });
